@@ -49,6 +49,7 @@ button {
 
 .home-inner,
 .final-inner,
+.intro-inner,
 .slideshow-shell {
   width: min(100%, 920px);
   animation: riseIn 900ms ease both;
@@ -121,6 +122,39 @@ h2 {
   overflow: hidden;
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.intro-screen {
+  padding: 10px;
+}
+
+.intro-inner {
+  display: grid;
+  height: calc(100vh - 20px);
+  height: calc(100dvh - 20px);
+  place-items: center;
+}
+
+.intro-frame {
+  position: relative;
+  width: min(100%, 920px);
+  height: min(82vh, 620px);
+  overflow: hidden;
+  border: 1px solid rgba(182, 139, 66, 0.22);
+  border-radius: 24px;
+  background: #1f1719;
+  box-shadow: var(--shadow);
+}
+
+.intro-frame video {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  animation: softFade 500ms ease both;
 }
 
 .slideshow-shell {

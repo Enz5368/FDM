@@ -5,10 +5,14 @@ const medias = [{"type":"image","src":"assets/photos/PHOTO-2024-10-29-23-51-09.j
 // Ajoute tes musiques MP3 dans assets/music/, puis complete cette liste si besoin.
 const musics = ["assets/music/’O surdato ’nnammurato Luciano Pavarotti and The Corrs live 1998.mp3","assets/music/Gipsy Kings Volare Official Video.mp3","assets/music/L italiano Toto Cutugno Video Ufficiale.mp3","assets/music/Paolo Conte Via Con Me.mp3","assets/music/SARÀ PERCHÉ TI AMO.mp3","assets/music/Tu vuo fa l americano 2007 Remastered.mp3"];
 
+// Les videos d'intro vont dans assets/start/.
+const startVideos = ["assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4","assets/start/WhatsApp Video 2026-05-31 at 12.34.15 AM.mp4"];
+
 const PHOTO_DURATION = 6500;
 
 const screens = {
   home: document.getElementById("homeScreen"),
+  intro: document.getElementById("introScreen"),
   slideshow: document.getElementById("slideshowScreen"),
   final: document.getElementById("finalScreen")
 };
@@ -16,6 +20,7 @@ const screens = {
 const elements = {
   start: document.getElementById("startButton"),
   restart: document.getElementById("restartButton"),
+  introFrame: document.getElementById("introFrame"),
   frame: document.getElementById("mediaFrame"),
   counter: document.getElementById("counter"),
   progress: document.getElementById("progressBar"),
@@ -38,6 +43,9 @@ let photoRemaining = PHOTO_DURATION;
 let isPaused = false;
 let musicWanted = false;
 let currentMusic = "";
+let introElement = null;
+let introPlaylist = [];
+let introIndex = 0;
 
 function shuffle(items) {
   const copy = [...items];
@@ -61,6 +69,58 @@ function startSlideshow() {
   showScreen("slideshow");
   if (!musicWanted && musics.length) startRandomMusic();
   showMedia();
+}
+
+function startExperience() {
+  if (!startVideos.length) {
+    startSlideshow();
+    return;
+  }
+
+  stopIntroVideo();
+  stopCurrentMedia();
+  if (!elements.audio.paused) elements.audio.pause();
+
+  introPlaylist = shuffle(startVideos);
+  introIndex = 0;
+  elements.introFrame.innerHTML = "";
+  showScreen("intro");
+  playNextIntroVideo();
+}
+
+function playNextIntroVideo() {
+  if (introIndex >= introPlaylist.length) {
+    stopIntroVideo();
+    startSlideshow();
+    return;
+  }
+
+  const intro = introPlaylist[introIndex];
+  introIndex += 1;
+  stopIntroVideo();
+
+  introElement = document.createElement("video");
+  introElement.src = intro;
+  introElement.controls = true;
+  introElement.autoplay = true;
+  introElement.playsInline = true;
+  introElement.preload = "auto";
+  introElement.muted = false;
+  introElement.volume = 1;
+  introElement.addEventListener("ended", playNextIntroVideo, { once: true });
+  introElement.addEventListener("error", playNextIntroVideo, { once: true });
+
+  elements.introFrame.innerHTML = "";
+  elements.introFrame.appendChild(introElement);
+  introElement.play().catch(() => {});
+}
+
+function stopIntroVideo() {
+  if (!introElement) return;
+  introElement.pause();
+  introElement.removeAttribute("src");
+  introElement.load();
+  introElement = null;
 }
 
 function clearMediaTimers() {
@@ -213,6 +273,7 @@ function togglePause() {
 
 function showFinalScreen() {
   stopCurrentMedia();
+  stopIntroVideo();
   preferMusic();
   showScreen("final");
 }
@@ -283,8 +344,8 @@ function setSoundButtons(videoSoundActive) {
   elements.listenMusic.classList.toggle("is-active", !isVideo || !videoSoundActive);
 }
 
-elements.start.addEventListener("click", startSlideshow);
-elements.restart.addEventListener("click", startSlideshow);
+elements.start.addEventListener("click", startExperience);
+elements.restart.addEventListener("click", startExperience);
 elements.previous.addEventListener("click", goPrevious);
 elements.next.addEventListener("click", goNext);
 elements.pause.addEventListener("click", togglePause);
