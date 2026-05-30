@@ -160,7 +160,7 @@ h2 {
 .slideshow-shell {
   display: grid;
   grid-template-rows: auto auto auto auto auto;
-  gap: 8px;
+  gap: 7px;
   height: calc(100vh - 20px);
   height: calc(100dvh - 20px);
   align-content: start;
@@ -199,7 +199,7 @@ h2 {
 .media-frame {
   display: grid;
   position: relative;
-  height: clamp(420px, 63vh, 690px);
+  height: clamp(460px, 70vh, 760px);
   min-height: 0;
   place-items: center;
   overflow: hidden;
@@ -367,7 +367,7 @@ main,
   }
 }
 
-@media (max-height: 760px) {
+@media (max-height: 760px) and (min-width: 681px) {
   .eyebrow {
     margin-bottom: 4px;
     font-size: 0.68rem;
@@ -378,7 +378,7 @@ main,
   }
 
   .media-frame {
-    height: 48vh;
+    height: 58vh;
   }
 
 }
