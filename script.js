@@ -97,7 +97,7 @@ function showMedia() {
 
   const item = playlist[currentIndex];
   elements.frame.innerHTML = "";
-  elements.caption.textContent = item.caption || "Un beau souvenir";
+  elements.caption.textContent = "JE T'AIME";
   elements.counter.textContent = (currentIndex + 1) + " / " + playlist.length;
   elements.previous.disabled = currentIndex === 0;
   elements.next.disabled = false;
