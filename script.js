@@ -13,7 +13,8 @@ const introVideoGains = {
   "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 6
 };
 
-const PHOTO_DURATION = 6500;
+const SLIDESHOW_SPEED = 2;
+const PHOTO_DURATION = 6500 / SLIDESHOW_SPEED;
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -198,7 +199,6 @@ function showMedia() {
   const item = playlist[currentIndex];
   elements.frame.innerHTML = "";
   elements.counter.textContent = (currentIndex + 1) + " / " + playlist.length;
-  updateRemainingTime();
   elements.previous.disabled = currentIndex === 0;
   elements.next.disabled = false;
   if (item.type === "video") {
@@ -209,8 +209,10 @@ function showMedia() {
     currentElement = createImage(item);
     elements.frame.appendChild(currentElement);
     setSoundButtons(false);
-    if (!isPaused) schedulePhotoAdvance(PHOTO_DURATION);
+    if (isPaused) photoRemaining = PHOTO_DURATION;
+    else schedulePhotoAdvance(PHOTO_DURATION);
   }
+  updateRemainingTime();
 
   preloadNextMedia();
 }
@@ -228,13 +230,14 @@ function createVideo(item) {
   const video = document.createElement("video");
   video.src = item.src;
   video.controls = true;
-  video.autoplay = true;
+  video.autoplay = !isPaused;
   video.playsInline = true;
+  video.playbackRate = SLIDESHOW_SPEED;
   video.preload = "metadata";
   video.muted = true;
   video.addEventListener("loadedmetadata", () => {
     if (Number.isFinite(video.duration)) {
-      mediaDurations[item.src] = video.duration * 1000;
+      mediaDurations[item.src] = (video.duration * 1000) / SLIDESHOW_SPEED;
       updateRemainingTime();
     }
     if (!isPaused) video.play().catch(() => {});
@@ -245,7 +248,7 @@ function createVideo(item) {
     goNext();
   });
   video.addEventListener("play", () => {
-    if (isPaused) togglePause();
+    if (isPaused) video.pause();
   });
   return video;
 }
@@ -275,7 +278,7 @@ function cacheVideoDurations(items) {
     mediaDurationProbes.push(video);
     video.addEventListener("loadedmetadata", () => {
       if (Number.isFinite(video.duration)) {
-        mediaDurations[item.src] = video.duration * 1000;
+        mediaDurations[item.src] = (video.duration * 1000) / SLIDESHOW_SPEED;
         updateRemainingTime();
       }
     }, { once: true });
@@ -312,7 +315,7 @@ function getRemainingPhotoDuration(isCurrent) {
 
 function getRemainingVideoDuration(item, isCurrent) {
   if (isCurrent && currentElement?.tagName === "VIDEO" && Number.isFinite(currentElement.duration)) {
-    return Math.max(0, (currentElement.duration - currentElement.currentTime) * 1000);
+    return Math.max(0, ((currentElement.duration - currentElement.currentTime) * 1000) / SLIDESHOW_SPEED);
   }
 
   return mediaDurations[item.src] || 0;
@@ -346,8 +349,6 @@ function goNext() {
     return;
   }
   currentIndex += 1;
-  isPaused = false;
-  elements.pause.textContent = "Pause";
   preferMusic();
   showMedia();
 }
@@ -355,8 +356,6 @@ function goNext() {
 function goPrevious() {
   if (currentIndex === 0) return;
   currentIndex -= 1;
-  isPaused = false;
-  elements.pause.textContent = "Pause";
   preferMusic();
   showMedia();
 }
@@ -430,7 +429,7 @@ function preferVideoSound() {
   currentElement.muted = false;
   elements.audio.volume = 0.12;
   if (musicWanted && !elements.audio.paused) elements.audio.pause();
-  currentElement.play().catch(() => {});
+  if (!isPaused) currentElement.play().catch(() => {});
   setSoundButtons(true);
 }
 
