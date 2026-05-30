@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f8dfe4">
+    <title>Bonne fête maman</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="petals" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <main>
+      <section class="screen home-screen is-visible" id="homeScreen">
+        <div class="home-inner">
+          <p class="eyebrow">Un cadeau rien que pour toi</p>
+          <h1>Bonne fête maman</h1>
+          <p class="home-message">
+            Bonne fête maman.<br>
+            Aujourd'hui, ce petit site est rien que pour toi.<br>
+            On voulait te rappeler à quel point tu comptes pour nous.
+          </p>
+          <button class="primary-button" id="startButton" type="button">
+            Découvrir tes souvenirs
+          </button>
+        </div>
+      </section>
+
+      <section class="screen slideshow-screen" id="slideshowScreen" aria-live="polite">
+        <div class="slideshow-shell">
+          <header class="slideshow-header">
+            <div>
+              <p class="eyebrow">Nos souvenirs</p>
+              <h2>Pour toi, maman</h2>
+            </div>
+            <p class="counter" id="counter">1 / 1</p>
+          </header>
+
+          <figure class="memory-card">
+            <div class="media-frame" id="mediaFrame">
+              <p class="loading-text">Chargement du souvenir...</p>
+            </div>
+            <figcaption id="caption">Un beau souvenir</figcaption>
+          </figure>
+
+          <div class="progress" aria-hidden="true">
+            <span id="progressBar"></span>
+          </div>
+
+          <div class="controls" aria-label="Commandes du diaporama">
+            <button class="control-button" id="previousButton" type="button">Précédent</button>
+            <button class="control-button" id="pauseButton" type="button">Pause</button>
+            <button class="control-button" id="nextButton" type="button">Suivant</button>
+          </div>
+
+          <div class="sound-controls" aria-label="Commandes du son">
+            <button class="control-button warm" id="musicToggleButton" type="button">Lancer la musique</button>
+            <button class="control-button" id="listenMusicButton" type="button">Écouter la musique</button>
+            <button class="control-button" id="listenVideoButton" type="button">Écouter la vidéo</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen final-screen" id="finalScreen">
+        <div class="final-inner">
+          <p class="eyebrow">Avec tout notre amour</p>
+          <h2>Merci pour tout maman.</h2>
+          <p>
+            On t'aime très fort.<br>
+            Bonne fête des mères.
+          </p>
+          <button class="primary-button" id="restartButton" type="button">
+            Revoir les souvenirs
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <audio id="backgroundMusic" preload="none"></audio>
+    <script src="script.js"></script>
+  </body>
+</html>
