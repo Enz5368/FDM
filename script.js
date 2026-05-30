@@ -28,6 +28,7 @@ const elements = {
   introFrame: document.getElementById("introFrame"),
   frame: document.getElementById("mediaFrame"),
   counter: document.getElementById("counter"),
+  remainingTime: document.getElementById("remainingTime"),
   progress: document.getElementById("progressBar"),
   previous: document.getElementById("previousButton"),
   next: document.getElementById("nextButton"),
@@ -43,6 +44,7 @@ let currentIndex = 0;
 let currentElement = null;
 let photoTimer = null;
 let progressTimer = null;
+let remainingTimer = null;
 let photoStartedAt = 0;
 let photoRemaining = PHOTO_DURATION;
 let isPaused = false;
@@ -54,6 +56,8 @@ let introIndex = 0;
 let audioContext = null;
 let introAudioSource = null;
 let introGainNode = null;
+const mediaDurations = {};
+const mediaDurationProbes = [];
 
 function shuffle(items) {
   const copy = [...items];
@@ -74,6 +78,8 @@ function startSlideshow() {
   currentIndex = 0;
   isPaused = false;
   elements.pause.textContent = "Pause";
+  cacheVideoDurations(playlist);
+  startRemainingTimer();
   showScreen("slideshow");
   if (!musicWanted && musics.length) startRandomMusic();
   showMedia();
@@ -192,6 +198,7 @@ function showMedia() {
   const item = playlist[currentIndex];
   elements.frame.innerHTML = "";
   elements.counter.textContent = (currentIndex + 1) + " / " + playlist.length;
+  updateRemainingTime();
   elements.previous.disabled = currentIndex === 0;
   elements.next.disabled = false;
   if (item.type === "video") {
@@ -226,8 +233,13 @@ function createVideo(item) {
   video.preload = "metadata";
   video.muted = true;
   video.addEventListener("loadedmetadata", () => {
+    if (Number.isFinite(video.duration)) {
+      mediaDurations[item.src] = video.duration * 1000;
+      updateRemainingTime();
+    }
     if (!isPaused) video.play().catch(() => {});
   }, { once: true });
+  video.addEventListener("timeupdate", updateRemainingTime);
   video.addEventListener("ended", () => {
     preferMusic();
     goNext();
@@ -250,6 +262,67 @@ function updateProgress() {
   const elapsed = Date.now() - photoStartedAt;
   const percent = Math.min(100, (elapsed / PHOTO_DURATION) * 100);
   elements.progress.style.width = percent + "%";
+  updateRemainingTime();
+}
+
+function cacheVideoDurations(items) {
+  items.forEach((item) => {
+    if (item.type !== "video" || mediaDurations[item.src]) return;
+
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.src = item.src;
+    mediaDurationProbes.push(video);
+    video.addEventListener("loadedmetadata", () => {
+      if (Number.isFinite(video.duration)) {
+        mediaDurations[item.src] = video.duration * 1000;
+        updateRemainingTime();
+      }
+    }, { once: true });
+  });
+}
+
+function startRemainingTimer() {
+  window.clearInterval(remainingTimer);
+  remainingTimer = window.setInterval(updateRemainingTime, 1000);
+  updateRemainingTime();
+}
+
+function clearRemainingTimer() {
+  window.clearInterval(remainingTimer);
+  remainingTimer = null;
+}
+
+function updateRemainingTime() {
+  if (!elements.remainingTime || !playlist.length || currentIndex >= playlist.length) return;
+
+  const remaining = playlist.slice(currentIndex).reduce((total, item, offset) => {
+    if (item.type === "image") return total + getRemainingPhotoDuration(offset === 0);
+    return total + getRemainingVideoDuration(item, offset === 0);
+  }, 0);
+
+  elements.remainingTime.textContent = "Fin dans " + formatRemainingTime(remaining);
+}
+
+function getRemainingPhotoDuration(isCurrent) {
+  if (!isCurrent) return PHOTO_DURATION;
+  if (isPaused) return photoRemaining;
+  return Math.max(0, PHOTO_DURATION - (Date.now() - photoStartedAt));
+}
+
+function getRemainingVideoDuration(item, isCurrent) {
+  if (isCurrent && currentElement?.tagName === "VIDEO" && Number.isFinite(currentElement.duration)) {
+    return Math.max(0, (currentElement.duration - currentElement.currentTime) * 1000);
+  }
+
+  return mediaDurations[item.src] || 0;
+}
+
+function formatRemainingTime(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return minutes + ":" + seconds;
 }
 
 function preloadNextMedia() {
@@ -309,6 +382,7 @@ function togglePause() {
 function showFinalScreen() {
   stopCurrentMedia();
   stopIntroVideo();
+  clearRemainingTimer();
   preferMusic();
   showScreen("final");
 }

@@ -184,6 +184,20 @@ h2 {
   white-space: nowrap;
 }
 
+.slideshow-meta {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.remaining-time {
+  margin: 0;
+  color: rgba(91, 62, 39, 0.58);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .memory-card {
   align-self: start;
   min-height: 0;
