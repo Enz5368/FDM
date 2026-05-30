@@ -7,8 +7,11 @@ const musics = ["assets/music/’O surdato ’nnammurato Luciano Pavarotti and T
 
 // Les videos d'intro vont dans assets/start/.
 const startVideos = ["assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4","assets/start/WhatsApp Video 2026-05-31 at 12.34.15 AM.mp4","assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4"];
-const boostedIntroVideo = "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4";
-const boostedIntroGain = 2.5;
+const introVideoGains = {
+  "assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4": 1.5,
+  "assets/start/WhatsApp Video 2026-05-31 at 12.34.15 AM.mp4": 1.5,
+  "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 2.5
+};
 
 const PHOTO_DURATION = 6500;
 
@@ -123,7 +126,8 @@ function playNextIntroVideo() {
 
 function boostIntroAudio(video, src) {
   clearIntroAudioBoost();
-  if (src !== boostedIntroVideo) return;
+  const gain = introVideoGains[src];
+  if (!gain) return;
 
   const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
   if (!AudioContextConstructor) return;
@@ -133,7 +137,7 @@ function boostIntroAudio(video, src) {
 
   introAudioSource = audioContext.createMediaElementSource(video);
   introGainNode = audioContext.createGain();
-  introGainNode.gain.value = boostedIntroGain;
+  introGainNode.gain.value = gain;
   introAudioSource.connect(introGainNode);
   introGainNode.connect(audioContext.destination);
 }
