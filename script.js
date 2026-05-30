@@ -8,9 +8,9 @@ const musics = ["assets/music/’O surdato ’nnammurato Luciano Pavarotti and T
 // Les videos d'intro vont dans assets/start/.
 const startVideos = ["assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4","assets/start/WhatsApp Video 2026-05-31 at 12.34.15 AM.mp4","assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4"];
 const introVideoGains = {
-  "assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4": 1.5,
+  "assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4": 2,
   "assets/start/WhatsApp Video 2026-05-31 at 12.34.15 AM.mp4": 1.5,
-  "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 2.5
+  "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 3
 };
 
 const PHOTO_DURATION = 6500;
