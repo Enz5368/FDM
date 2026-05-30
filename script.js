@@ -30,7 +30,6 @@ const elements = {
   frame: document.getElementById("mediaFrame"),
   counter: document.getElementById("counter"),
   remainingTime: document.getElementById("remainingTime"),
-  progress: document.getElementById("progressBar"),
   previous: document.getElementById("previousButton"),
   next: document.getElementById("nextButton"),
   pause: document.getElementById("pauseButton"),
@@ -44,7 +43,6 @@ let playlist = [];
 let currentIndex = 0;
 let currentElement = null;
 let photoTimer = null;
-let progressTimer = null;
 let remainingTimer = null;
 let photoStartedAt = 0;
 let photoRemaining = PHOTO_DURATION;
@@ -167,10 +165,7 @@ function stopIntroVideo() {
 
 function clearMediaTimers() {
   window.clearTimeout(photoTimer);
-  window.clearInterval(progressTimer);
   photoTimer = null;
-  progressTimer = null;
-  elements.progress.style.width = "0%";
 }
 
 function stopCurrentMedia() {
@@ -258,13 +253,6 @@ function schedulePhotoAdvance(duration) {
   photoRemaining = duration;
   photoStartedAt = Date.now();
   photoTimer = window.setTimeout(goNext, duration);
-  progressTimer = window.setInterval(updateProgress, 100);
-}
-
-function updateProgress() {
-  const elapsed = Date.now() - photoStartedAt;
-  const percent = Math.min(100, (elapsed / PHOTO_DURATION) * 100);
-  elements.progress.style.width = percent + "%";
   updateRemainingTime();
 }
 
