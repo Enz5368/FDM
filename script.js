@@ -17,7 +17,6 @@ const elements = {
   start: document.getElementById("startButton"),
   restart: document.getElementById("restartButton"),
   frame: document.getElementById("mediaFrame"),
-  caption: document.getElementById("caption"),
   counter: document.getElementById("counter"),
   progress: document.getElementById("progressBar"),
   previous: document.getElementById("previousButton"),
@@ -97,7 +96,6 @@ function showMedia() {
 
   const item = playlist[currentIndex];
   elements.frame.innerHTML = "";
-  elements.caption.textContent = "JE T'AIME";
   elements.counter.textContent = (currentIndex + 1) + " / " + playlist.length;
   elements.previous.disabled = currentIndex === 0;
   elements.next.disabled = false;

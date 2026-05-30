@@ -194,15 +194,6 @@ h2 {
   font-weight: 700;
 }
 
-figcaption {
-  min-height: 26px;
-  padding: 8px 6px 0;
-  color: var(--muted);
-  text-align: center;
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
 .progress {
   height: 5px;
   overflow: hidden;
@@ -354,9 +345,6 @@ main,
     height: 48vh;
   }
 
-  figcaption {
-    font-size: 0.92rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
