@@ -7,6 +7,8 @@ const musics = ["assets/music/’O surdato ’nnammurato Luciano Pavarotti and T
 
 // Les videos d'intro vont dans assets/start/.
 const startVideos = ["assets/start/WhatsApp Video 2026-05-30 at 11.42.35 PM.mp4","assets/start/WhatsApp Video 2026-05-31 at 12.34.15 AM.mp4","assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4"];
+const boostedIntroVideo = "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4";
+const boostedIntroGain = 2.5;
 
 const PHOTO_DURATION = 6500;
 
@@ -46,6 +48,9 @@ let currentMusic = "";
 let introElement = null;
 let introPlaylist = [];
 let introIndex = 0;
+let audioContext = null;
+let introAudioSource = null;
+let introGainNode = null;
 
 function shuffle(items) {
   const copy = [...items];
@@ -107,6 +112,7 @@ function playNextIntroVideo() {
   introElement.preload = "auto";
   introElement.muted = false;
   introElement.volume = 1;
+  boostIntroAudio(introElement, intro);
   introElement.addEventListener("ended", playNextIntroVideo, { once: true });
   introElement.addEventListener("error", playNextIntroVideo, { once: true });
 
@@ -115,9 +121,34 @@ function playNextIntroVideo() {
   introElement.play().catch(() => {});
 }
 
+function boostIntroAudio(video, src) {
+  clearIntroAudioBoost();
+  if (src !== boostedIntroVideo) return;
+
+  const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextConstructor) return;
+
+  if (!audioContext) audioContext = new AudioContextConstructor();
+  if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+
+  introAudioSource = audioContext.createMediaElementSource(video);
+  introGainNode = audioContext.createGain();
+  introGainNode.gain.value = boostedIntroGain;
+  introAudioSource.connect(introGainNode);
+  introGainNode.connect(audioContext.destination);
+}
+
+function clearIntroAudioBoost() {
+  if (introAudioSource) introAudioSource.disconnect();
+  if (introGainNode) introGainNode.disconnect();
+  introAudioSource = null;
+  introGainNode = null;
+}
+
 function stopIntroVideo() {
   if (!introElement) return;
   introElement.pause();
+  clearIntroAudioBoost();
   introElement.removeAttribute("src");
   introElement.load();
   introElement = null;
