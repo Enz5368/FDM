@@ -128,9 +128,13 @@ function createVideo(item) {
   const video = document.createElement("video");
   video.src = item.src;
   video.controls = true;
+  video.autoplay = true;
   video.playsInline = true;
   video.preload = "metadata";
   video.muted = true;
+  video.addEventListener("loadedmetadata", () => {
+    if (!isPaused) video.play().catch(() => {});
+  }, { once: true });
   video.addEventListener("ended", () => {
     preferMusic();
     goNext();
