@@ -13,8 +13,7 @@ const introVideoGains = {
   "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 6
 };
 
-const SLIDESHOW_SPEED = 2;
-const PHOTO_DURATION = 6500 / SLIDESHOW_SPEED;
+const PHOTO_DURATION = 6500;
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -30,6 +29,7 @@ const elements = {
   frame: document.getElementById("mediaFrame"),
   counter: document.getElementById("counter"),
   remainingTime: document.getElementById("remainingTime"),
+  progress: document.getElementById("progressBar"),
   previous: document.getElementById("previousButton"),
   next: document.getElementById("nextButton"),
   pause: document.getElementById("pauseButton"),
@@ -43,6 +43,7 @@ let playlist = [];
 let currentIndex = 0;
 let currentElement = null;
 let photoTimer = null;
+let progressTimer = null;
 let remainingTimer = null;
 let photoStartedAt = 0;
 let photoRemaining = PHOTO_DURATION;
@@ -165,7 +166,10 @@ function stopIntroVideo() {
 
 function clearMediaTimers() {
   window.clearTimeout(photoTimer);
+  window.clearInterval(progressTimer);
   photoTimer = null;
+  progressTimer = null;
+  elements.progress.style.width = "0%";
 }
 
 function stopCurrentMedia() {
@@ -194,6 +198,7 @@ function showMedia() {
   const item = playlist[currentIndex];
   elements.frame.innerHTML = "";
   elements.counter.textContent = (currentIndex + 1) + " / " + playlist.length;
+  updateRemainingTime();
   elements.previous.disabled = currentIndex === 0;
   elements.next.disabled = false;
   if (item.type === "video") {
@@ -204,10 +209,8 @@ function showMedia() {
     currentElement = createImage(item);
     elements.frame.appendChild(currentElement);
     setSoundButtons(false);
-    if (isPaused) photoRemaining = PHOTO_DURATION;
-    else schedulePhotoAdvance(PHOTO_DURATION);
+    if (!isPaused) schedulePhotoAdvance(PHOTO_DURATION);
   }
-  updateRemainingTime();
 
   preloadNextMedia();
 }
@@ -225,14 +228,13 @@ function createVideo(item) {
   const video = document.createElement("video");
   video.src = item.src;
   video.controls = true;
-  video.autoplay = !isPaused;
+  video.autoplay = true;
   video.playsInline = true;
-  video.playbackRate = SLIDESHOW_SPEED;
   video.preload = "metadata";
   video.muted = true;
   video.addEventListener("loadedmetadata", () => {
     if (Number.isFinite(video.duration)) {
-      mediaDurations[item.src] = (video.duration * 1000) / SLIDESHOW_SPEED;
+      mediaDurations[item.src] = video.duration * 1000;
       updateRemainingTime();
     }
     if (!isPaused) video.play().catch(() => {});
@@ -243,7 +245,7 @@ function createVideo(item) {
     goNext();
   });
   video.addEventListener("play", () => {
-    if (isPaused) video.pause();
+    if (isPaused) togglePause();
   });
   return video;
 }
@@ -253,6 +255,13 @@ function schedulePhotoAdvance(duration) {
   photoRemaining = duration;
   photoStartedAt = Date.now();
   photoTimer = window.setTimeout(goNext, duration);
+  progressTimer = window.setInterval(updateProgress, 100);
+}
+
+function updateProgress() {
+  const elapsed = Date.now() - photoStartedAt;
+  const percent = Math.min(100, (elapsed / PHOTO_DURATION) * 100);
+  elements.progress.style.width = percent + "%";
   updateRemainingTime();
 }
 
@@ -266,7 +275,7 @@ function cacheVideoDurations(items) {
     mediaDurationProbes.push(video);
     video.addEventListener("loadedmetadata", () => {
       if (Number.isFinite(video.duration)) {
-        mediaDurations[item.src] = (video.duration * 1000) / SLIDESHOW_SPEED;
+        mediaDurations[item.src] = video.duration * 1000;
         updateRemainingTime();
       }
     }, { once: true });
@@ -303,7 +312,7 @@ function getRemainingPhotoDuration(isCurrent) {
 
 function getRemainingVideoDuration(item, isCurrent) {
   if (isCurrent && currentElement?.tagName === "VIDEO" && Number.isFinite(currentElement.duration)) {
-    return Math.max(0, ((currentElement.duration - currentElement.currentTime) * 1000) / SLIDESHOW_SPEED);
+    return Math.max(0, (currentElement.duration - currentElement.currentTime) * 1000);
   }
 
   return mediaDurations[item.src] || 0;
@@ -337,6 +346,8 @@ function goNext() {
     return;
   }
   currentIndex += 1;
+  isPaused = false;
+  elements.pause.textContent = "Pause";
   preferMusic();
   showMedia();
 }
@@ -344,6 +355,8 @@ function goNext() {
 function goPrevious() {
   if (currentIndex === 0) return;
   currentIndex -= 1;
+  isPaused = false;
+  elements.pause.textContent = "Pause";
   preferMusic();
   showMedia();
 }
@@ -417,7 +430,7 @@ function preferVideoSound() {
   currentElement.muted = false;
   elements.audio.volume = 0.12;
   if (musicWanted && !elements.audio.paused) elements.audio.pause();
-  if (!isPaused) currentElement.play().catch(() => {});
+  currentElement.play().catch(() => {});
   setSoundButtons(true);
 }
 

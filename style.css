@@ -244,6 +244,22 @@ h2 {
   font-weight: 700;
 }
 
+.progress {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(182, 139, 66, 0.18);
+}
+
+.progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--rose-deep), var(--gold));
+  transition: width 250ms linear;
+}
+
 .controls,
 .sound-controls {
   display: flex;
