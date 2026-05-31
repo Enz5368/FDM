@@ -232,7 +232,7 @@ h2 {
   height: 100%;
   object-fit: contain;
   object-position: center center;
-  animation: softFade 1000ms ease both;
+  animation: softFade 500ms ease both;
 }
 
 .media-frame video {
