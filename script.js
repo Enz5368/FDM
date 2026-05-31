@@ -210,7 +210,8 @@ function showMedia() {
     currentElement = createImage(item);
     elements.frame.appendChild(currentElement);
     setSoundButtons(false);
-    if (!isPaused) schedulePhotoAdvance(PHOTO_DURATION);
+    if (isPaused) photoRemaining = PHOTO_DURATION;
+    else schedulePhotoAdvance(PHOTO_DURATION);
   }
 
   preloadNextMedia();
@@ -229,7 +230,7 @@ function createVideo(item) {
   const video = document.createElement("video");
   video.src = item.src;
   video.controls = true;
-  video.autoplay = true;
+  video.autoplay = !isPaused;
   video.playsInline = true;
   keepNormalVideoSpeed(video);
   video.preload = "metadata";
@@ -247,7 +248,7 @@ function createVideo(item) {
     goNext();
   });
   video.addEventListener("play", () => {
-    if (isPaused) togglePause();
+    if (isPaused) video.pause();
   });
   return video;
 }
@@ -356,8 +357,6 @@ function goNext() {
     return;
   }
   currentIndex += 1;
-  isPaused = false;
-  elements.pause.textContent = "Pause";
   preferMusic();
   showMedia();
 }
@@ -365,8 +364,6 @@ function goNext() {
 function goPrevious() {
   if (currentIndex === 0) return;
   currentIndex -= 1;
-  isPaused = false;
-  elements.pause.textContent = "Pause";
   preferMusic();
   showMedia();
 }
@@ -440,7 +437,7 @@ function preferVideoSound() {
   currentElement.muted = false;
   elements.audio.volume = 0.12;
   if (musicWanted && !elements.audio.paused) elements.audio.pause();
-  currentElement.play().catch(() => {});
+  if (!isPaused) currentElement.play().catch(() => {});
   setSoundButtons(true);
 }
 
