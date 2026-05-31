@@ -52,7 +52,7 @@ button {
 .intro-inner,
 .slideshow-shell {
   width: min(100%, 920px);
-  animation: riseIn 1530ms ease both;
+  animation: riseIn 900ms ease both;
 }
 
 .home-inner,
@@ -100,7 +100,7 @@ h2 {
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  transition: transform 306ms ease, box-shadow 306ms ease, background 306ms ease;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
 .primary-button {
@@ -154,7 +154,7 @@ h2 {
   height: 100%;
   object-fit: contain;
   object-position: center center;
-  animation: softFade 850ms ease both;
+  animation: softFade 500ms ease both;
 }
 
 .slideshow-shell {
@@ -290,7 +290,7 @@ h2 {
   height: 20px;
   border-radius: 60% 40% 65% 35%;
   background: rgba(199, 95, 114, 0.2);
-  animation: drift 22.1s linear infinite;
+  animation: drift 13s linear infinite;
 }
 
 .petals span:nth-child(1) { left: 8%; animation-delay: 0s; }

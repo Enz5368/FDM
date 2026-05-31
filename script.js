@@ -13,8 +13,7 @@ const introVideoGains = {
   "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 6
 };
 
-const SLIDESHOW_SPEED = 2;
-const PHOTO_DURATION = 6500 / SLIDESHOW_SPEED;
+const PHOTO_DURATION = 6500;
 
 const screens = {
   home: document.getElementById("homeScreen"),
@@ -227,12 +226,12 @@ function createVideo(item) {
   video.controls = true;
   video.autoplay = !isPaused;
   video.playsInline = true;
-  video.playbackRate = SLIDESHOW_SPEED;
+  video.playbackRate = 1;
   video.preload = "metadata";
   video.muted = true;
   video.addEventListener("loadedmetadata", () => {
     if (Number.isFinite(video.duration)) {
-      mediaDurations[item.src] = (video.duration * 1000) / SLIDESHOW_SPEED;
+      mediaDurations[item.src] = video.duration * 1000;
       updateRemainingTime();
     }
     if (!isPaused) video.play().catch(() => {});
@@ -266,7 +265,7 @@ function cacheVideoDurations(items) {
     mediaDurationProbes.push(video);
     video.addEventListener("loadedmetadata", () => {
       if (Number.isFinite(video.duration)) {
-        mediaDurations[item.src] = (video.duration * 1000) / SLIDESHOW_SPEED;
+        mediaDurations[item.src] = video.duration * 1000;
         updateRemainingTime();
       }
     }, { once: true });
@@ -303,7 +302,7 @@ function getRemainingPhotoDuration(isCurrent) {
 
 function getRemainingVideoDuration(item, isCurrent) {
   if (isCurrent && currentElement?.tagName === "VIDEO" && Number.isFinite(currentElement.duration)) {
-    return Math.max(0, ((currentElement.duration - currentElement.currentTime) * 1000) / SLIDESHOW_SPEED);
+    return Math.max(0, (currentElement.duration - currentElement.currentTime) * 1000);
   }
 
   return mediaDurations[item.src] || 0;
