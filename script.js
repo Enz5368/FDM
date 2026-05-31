@@ -121,6 +121,7 @@ function playNextIntroVideo() {
   introElement.preload = "auto";
   introElement.muted = false;
   introElement.volume = 1;
+  keepNormalVideoSpeed(introElement);
   boostIntroAudio(introElement, intro);
   introElement.addEventListener("ended", playNextIntroVideo, { once: true });
   introElement.addEventListener("error", playNextIntroVideo, { once: true });
@@ -230,6 +231,7 @@ function createVideo(item) {
   video.controls = true;
   video.autoplay = true;
   video.playsInline = true;
+  keepNormalVideoSpeed(video);
   video.preload = "metadata";
   video.muted = true;
   video.addEventListener("loadedmetadata", () => {
@@ -248,6 +250,14 @@ function createVideo(item) {
     if (isPaused) togglePause();
   });
   return video;
+}
+
+function keepNormalVideoSpeed(video) {
+  video.defaultPlaybackRate = 1;
+  video.playbackRate = 1;
+  video.addEventListener("ratechange", () => {
+    if (video.playbackRate !== 1) video.playbackRate = 1;
+  });
 }
 
 function schedulePhotoAdvance(duration) {
