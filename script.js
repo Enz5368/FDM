@@ -13,7 +13,7 @@ const introVideoGains = {
   "assets/start/WhatsApp Video 2026-05-31 at 1.18.30 AM.mp4": 6
 };
 
-const PHOTO_DURATION = 6500;
+const PHOTO_DURATION = 4000;
 
 const screens = {
   home: document.getElementById("homeScreen"),
